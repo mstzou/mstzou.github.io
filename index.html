@@ -1,6 +1,24 @@
-test-12345
-title
-<script>
-window.electron.doThing()
-</script>
+<html>
+  <head>
+    <title>Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>     
+    <script type="text/javascript" src="demo.js"></script>
+    <style>
+      span { font-size: small; display: block; }
+      span.error { color: red; }
+      stdout { color: green; }
+    </style>
+  </head>
+  <body>
+    <div class="form"></div>
+    <div class="stdout">
+      <p>stdout:</p>
+    </div>
+    <div class="stderr">
+      <p>stderr:</p>
+    </div>
+
+  </body>
+</html>
 
