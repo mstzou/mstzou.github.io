@@ -7,16 +7,22 @@
     <style>
       span { font-size: small; display: block; }
       span.error { color: red; }
-      stdout { color: green; }
+      div.lstdout { 
+        color: green; 
+        border-width: 3px;
+        border-style: dashed;
+        border-color: #FFAC55;
+        padding: 5px;
+        min-height: 100px;
+      }
     </style>
   </head>
   <body>
     <div class="form"></div>
     <div class="stdout">
-      <p>stdout:</p>
+      <!-- <p>stdout:</p> -->
     </div>
     <div class="stderr">
-      <p>stderr:</p>
     </div>
 
   </body>
