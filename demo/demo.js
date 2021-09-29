@@ -3,7 +3,7 @@ $(() => {
     window.api.send('StartBackgroundJob')
     
     window.api.receive("UpdateBackgroundJobStatus", (data) => {
-        console.log(`Received ${data} from main process`)
+        console.log("Received from main process: ", data)
         $(".stdout").append(`<span>Received: ${data}</span>`)
     })
 })
