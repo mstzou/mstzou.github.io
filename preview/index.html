@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head><link rel="preconnect" href="//cdn.testing.sherlock.hpsecloud.net/" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Sherlock Client</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+	<script src="https://kit.fontawesome.com/a641b063a7.js" crossorigin="anonymous"></script>
+	<link href="//cdn.testing.sherlock.hpsecloud.net/css/sherlock-client-main.min.css?v=7EPwkbsp5LMCWWZ-DvgVhaGkefW1pwhX2VUJTXRQXKQ" rel="stylesheet" />
+
+</head>
+<body>
+	<script>
+		const SwitchJob = (function () {
+			function SwitchJob(elmId) {
+				this.element = document.getElementById(elmId);
+				this.height = 40;
+				this.step = 5;
+				this.curHeight = 0;
+				this.jobIndex = 0;
+				this.timer = null;
+			};
+
+			SwitchJob.prototype = {
+				move: function () {
+					let self = this;
+					if (this.curHeight == this.height) {
+						this.curHeight = 0;
+						if (this.element.scrollTop >= this.element.scrollHeight - this.height) {
+							this.stop();
+						}
+						return true;
+					}
+					this.element.scrollTop += this.step;
+					this.curHeight += this.step;
+					this.timer = setTimeout(function () {
+						self.move();
+					}, 20);
+				},
+				stop: function () {
+					clearTimeout(this.timer);
+				}
+			};
+
+			return SwitchJob;
+		})();
+
+		function UpdateJob (switchJob, data) {
+			let elm = document.querySelector("[data-job='" + data.key + "']");
+			if (elm) {
+				if (data.status === 'start') {
+					elm.classList.add('job-starting');
+					elm.children[0].innerHTML = '<i class="fas fa-sync fa-spin"></i>';
+				}
+				else if (data.status === 'done') {
+					elm.classList.remove('job-starting');
+					elm.classList.add('job-done');
+					if (data.key !== 'completed') {
+						elm.children[0].innerHTML = '<i class="fas fa-check"></i>';
+					}
+					if (data.key !== 'captureTool' && data.key !== 'completed') {
+						switchJob.move();
+					}
+				}
+				else {
+					elm.classList.remove('job-starting', 'job-done');
+					elm.classList.add('job-fail');
+					elm.children[0].innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+				}
+			}
+		}
+
+		(function () {
+			const switchJob = new SwitchJob('jobList');
+			window.api.receive("UpdateBackgroundJobStatus", (data) => {
+				UpdateJob(switchJob, data);
+			});
+			window.api.send('StartBackgroundJob', true);
+		})();
+	</script>
+	<div id="wholePage" class="clear-fix">
+		<div id="SherlockClient" class="sherlock-client container-fluid">
+			<div class="sherlock-mark">
+				<div class="logo-image"></div>
+				<h1>Sherlock</h1>
+				<h2>Client</h2>
+			</div>
+			<div id="backgroudJobs" class="row">
+				<div class="col-7 bgjb-offset-1 bg-jobs-area">
+					<label class="sc-box-label">Background Jobs</label>
+					<ul id="jobList" class="sc-bg-job-list d-inline-flex">
+						<li class="sc-bg-job-item" data-job="captureTool">
+							<span></span> Collecting logs through Capture Tool... (1/4)
+						</li>
+						<li class="sc-bg-job-item" data-job="dumpFile">
+							<span></span> Checking dump files... (2/4)
+						</li>
+						<li class="sc-bg-job-item" data-job="odt">
+							<span></span> Analyzing memory dump through Observation Diagnosis Tool... (3/4)
+						</li>
+						<li class="sc-bg-job-item" data-job="uploadToS3">
+							<span></span> Upload Capture Tool logs and ODT output results... (4/4)
+						</li>
+						<li class="sc-bg-job-item" data-job="completed">
+							-- All analysis processes are completed --
+						</li>
+					</ul>
+				</div>
+			</div>
+			
+
+		</div>
+	</div>
+</body>
+</html>
