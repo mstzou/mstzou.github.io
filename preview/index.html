@@ -76,7 +76,7 @@
 		(function () {
 			const switchJob = new SwitchJob('jobList');
 			window.api.receive("UpdateBackgroundJobStatus", (data) => {
-				UpdateJob(switchJob, data);
+				UpdateJob(new SwitchJob('jobList'), data);
 			});
 			window.api.send('StartBackgroundJob', true);
 		})();
