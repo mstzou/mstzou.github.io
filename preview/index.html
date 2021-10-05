@@ -16,6 +16,9 @@
 	<script>
 		const SwitchJob = (function () {
 			function SwitchJob(elmId) {
+				console.log(elmId)
+				console.log(document.getElementById(elmId))
+
 				this.element = document.getElementById(elmId);
 				this.height = 40;
 				this.step = 5;
@@ -76,7 +79,7 @@
 		(function () {
 			const switchJob = new SwitchJob('jobList');
 			window.api.receive("UpdateBackgroundJobStatus", (data) => {
-				UpdateJob(new SwitchJob('jobList'), data);
+				UpdateJob(switchJob, data);
 			});
 			window.api.send('StartBackgroundJob', true);
 		})();
