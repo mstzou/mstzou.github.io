@@ -29,7 +29,9 @@
 
 			SwitchJob.prototype = {
 				move: function () {
-					let self = this;
+					let self = 						
+					console.log(this.element)
+					console.log(this.element.scrollTop)					
 					if (this.curHeight == this.height) {
 						this.curHeight = 0;
 						if (this.element.scrollTop >= this.element.scrollHeight - this.height) {
