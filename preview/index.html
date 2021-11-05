@@ -1,37 +1,31 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html id="_sherlockClient" lang="en">
 <head><link rel="preconnect" href="//cdn.testing.sherlock.hpsecloud.net/" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
 	<title>Sherlock Client</title>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
 	<script src="https://kit.fontawesome.com/a641b063a7.js" crossorigin="anonymous"></script>
-	<link href="//cdn.testing.sherlock.hpsecloud.net/css/sherlock-client-main.min.css?v=7EPwkbsp5LMCWWZ-DvgVhaGkefW1pwhX2VUJTXRQXKQ" rel="stylesheet" />
+	<link href="//cdn.testing.sherlock.hpsecloud.net/css/sherlock-client-main.min.css?v=wmcpe4jN3O0eY5hgd-kUwu6vJ1pkWq-H0HmXLQP9jao" rel="stylesheet" />
 
 </head>
 <body>
 	<script>
 		const SwitchJob = (function () {
 			function SwitchJob(elmId) {
-				console.log(elmId)
-				console.log(document.getElementById(elmId))
-
 				this.element = document.getElementById(elmId);
 				this.height = 40;
 				this.step = 5;
 				this.curHeight = 0;
-				this.jobIndex = 0;
 				this.timer = null;
 			};
 
 			SwitchJob.prototype = {
 				move: function () {
-					let self = 						
-					console.log(this.element)
-					console.log(this.element.scrollTop)					
+					let self = this;
 					if (this.curHeight == this.height) {
 						this.curHeight = 0;
 						if (this.element.scrollTop >= this.element.scrollHeight - this.height) {
@@ -55,67 +49,186 @@
 
 		function UpdateJob (switchJob, data) {
 			let elm = document.querySelector("[data-job='" + data.key + "']");
+			let spin = document.querySelector('.sc-bg-spin');
 			if (elm) {
 				if (data.status === 'start') {
 					elm.classList.add('job-starting');
-					elm.children[0].innerHTML = '<i class="fas fa-sync fa-spin"></i>';
+					spin.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
 				}
 				else if (data.status === 'done') {
 					elm.classList.remove('job-starting');
 					elm.classList.add('job-done');
-					if (data.key !== 'completed') {
-						elm.children[0].innerHTML = '<i class="fas fa-check"></i>';
+					if (data.key === 'completed') {
+						spin.innerHTML = '<i class="fas fa-check"></i>';
 					}
-					if (data.key !== 'captureTool' && data.key !== 'completed') {
-						switchJob.move();
-					}
+					switchJob.move();
 				}
 				else {
 					elm.classList.remove('job-starting', 'job-done');
 					elm.classList.add('job-fail');
-					elm.children[0].innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+					spin.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
 				}
 			}
 		}
 
 		(function () {
-			const switchJob = new SwitchJob('jobList');
-			window.api.receive("UpdateBackgroundJobStatus", (data) => {
-				UpdateJob(switchJob, data);
-			});
-			window.api.send('StartBackgroundJob', true);
+			if (window.api) {
+				window.api.receive("UpdateBackgroundJobStatus", (data) => {
+					UpdateJob(new SwitchJob('jobList'), data);
+				});
+				window.api.send('StartBackgroundJob', true);
+                window.api.send('WatsonResults', {result: "90%"});
+
+			}
 		})();
 	</script>
 	<div id="wholePage" class="clear-fix">
-		<div id="SherlockClient" class="sherlock-client container-fluid">
-			<div class="sherlock-mark">
-				<div class="logo-image"></div>
-				<h1>Sherlock</h1>
-				<h2>Client</h2>
+		<div id="appTop" class="app-top container-xxl">
+			<div class="app-top-content">
+				<div class="sherlock-mark">
+					<div class="logo-image"></div>
+					<h1><span class="app-name">Sherlock</span><span class="sub-app-name">Client</span></h1>
+				</div>
 			</div>
 			<div id="backgroudJobs" class="row">
-				<div class="col-7 bgjb-offset-1 bg-jobs-area">
-					<label class="sc-box-label">Background Jobs</label>
+				<div class="col-5 bgjb-offset-1 bg-jobs-area">
 					<ul id="jobList" class="sc-bg-job-list d-inline-flex">
 						<li class="sc-bg-job-item" data-job="captureTool">
-							<span></span> Collecting logs through Capture Tool... (1/4)
+							(1/4) Collecting logs through Capture Tool...
 						</li>
 						<li class="sc-bg-job-item" data-job="dumpFile">
-							<span></span> Checking dump files... (2/4)
+							(2/4) Checking dump files...
 						</li>
 						<li class="sc-bg-job-item" data-job="odt">
-							<span></span> Analyzing memory dump through Observation Diagnosis Tool... (3/4)
+							(3/4) Analyzing memory dump through Observation Diagnosis Tool...
 						</li>
 						<li class="sc-bg-job-item" data-job="uploadToS3">
-							<span></span> Upload Capture Tool logs and ODT output results... (4/4)
+							(4/4) Upload Capture Tool logs and ODT output results...
 						</li>
 						<li class="sc-bg-job-item" data-job="completed">
 							-- All analysis processes are completed --
 						</li>
 					</ul>
+					<span class="sc-bg-spin"></span>
 				</div>
 			</div>
+		</div>
+		<div id="appMain" class="app-main container-xxl">
 			
+<div class="preview-offset-1">
+	<div class="row">
+		<div class="col-9 preview-area">
+			<label class="sc-box-label">Preivew</label>
+			<div class="row">
+				<div class="col-4 preview-components">
+					<div class="mb-2 row">
+						<label for="pre_PrimaryProduct" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low"></i> Primary Product</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_PrimaryProduct" value="​Corvette14">
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_ProductVersion" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low"></i> Product Version</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_ProductVersion" value="​Corvette14 1.0">
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_ComponentType" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low-fill"></i> Component Type</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_ComponentType" value="SW">
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_SubSystem" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low-fill"></i> Sub System</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_SubSystem" value="OS - Image">
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_Component" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low-fill"></i> Component</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_Component" value="HP OS Image">
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_ComponentVer" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low-fill"></i> Component Version</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_ComponentVer" value="1,1,1 || XX">
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_Localization" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low-fill"></i> Localization</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_Localization" value="XX">
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_ComponentPartNo" class="col-sm-5 col-form-label"><i class="bi bi-brightness-low-fill"></i> Component Part No.</label>
+						<div class="col-sm-7">
+							<input type="text" readonly class="form-control" id="pre_ComponentPartNo" value="432622">
+						</div>
+					</div>
+					<div class="row mt-5">
+						<div class="offset-4 col-8">
+							<div class="row row-cols-2 preview-legend">
+								<div class="col"><i class="bi bi-brightness-low"></i> User Input</div>
+								<div class="col"><i class="bi bi-brightness-low-fill"></i> AI Prediction</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-8 preview-descriptions">
+					<div class="mb-2 row">
+						<label for="pre_ShortDescription" class="col-sm-2 col-form-label"><i class="bi bi-brightness-low"></i> Short Description</label>
+						<div class="col-sm-10">
+							<textarea readonly class="form-control" id="pre_ShortDescription" rows="2">Inventec / Module-ACC-NB : BSOD(0x7e) occurred after Resume from S4 with Z24u G3 monitor.</textarea>
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_LongDescription" class="col-sm-2 col-form-label"><i class="bi bi-brightness-low"></i> Long Description</label>
+						<div class="col-sm-10">
+							<textarea readonly class="form-control" id="pre_LongDescription" rows="8">Module/Accessory/NB/Corvette14/Display Test/Intermittent/Non-Adhoc
+Image: Win10 20H2 19042.746 Rev.AJ
+BIOS: T76 Ver.01.01.30
+Monitor: HP Z24u(FW:1.2.0.0)
+Test device: HP Z Display Speaker Bar G3/M45389-001
+Fail rate: 1 out of 2 units; 1 out of 10 times.
+Fail unit: Corvette14 MV SKU1#301
+Pass Units: Corvette15 MV SKU16#4K8
+Tester: Zhou.Aaronp  
+***********************************************************   
+Test plan name: Module NB Accessory BulletS + Z Display Test-IEC  
+Test case name: [Display Validation] Bullet Speaker Bar  
+Test case ID: NCAS2-0000048071.1  Test Step:1-1-15  
+************************************************************  
+Issue Description:  Attach Bullet via USB-A cable to the monitor, then connect the monitor to UUT.
+Press OSD menu, then select the USB-C MST Configuration to "USB 2.0".BSOD(0x7e) occurred after resume
+ from S4 with Z24u monitor connected  
+Note:  1. Please refer to the related logs from the link below.  
+Internal: FTP://10.96.3.65   
+External: FTP://183.230.197.230  Account: ICCOBS  Password: ICCQA+2020si  Path:/2021/Corvette/0X7e    
+How to recover: None </textarea>
+						</div>
+					</div>
+					<div class="mb-2 row">
+						<label for="pre_Step" class="col-sm-2 col-form-label"><i class="bi bi-brightness-low"></i> Step to Reproduce</label>
+						<div class="col-sm-10">
+							<textarea readonly class="form-control" id="pre_Step" rows="7">1.Connect the speaker bar to Z24u monitor and then dock the system.  
+2.Set the USB-C MST Configuration to "USB 2.0" on OSD menu.  
+3.Put the system into S4.  
+4.Wake the unit from S4.  
+5.BSOD(0x7e) occurred.-->Issue    </textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-9 dd-area mt-1">
+			DD Area
+		</div>
+	</div>
+</div>
 
 		</div>
 	</div>
