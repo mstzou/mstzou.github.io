@@ -75,10 +75,9 @@
 			if (window.api) {
 				window.api.receive("UpdateBackgroundJobStatus", (data) => {
 					console.log(data)
-					if (data.key == '' && data.response && data.response.bsod == false) {
+					if (data.key == 'dumpFile' && data.response && data.response.bsod == false) {
 						console.log('ask predict')
 						setTimeout(window.api.send('WatsonResults', {result: "90%"}), 60000)
-						
 					} else 
 						UpdateJob(new SwitchJob('jobList'), data);
 				});
