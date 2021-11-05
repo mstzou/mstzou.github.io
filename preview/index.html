@@ -74,12 +74,16 @@
 		(function () {
 			if (window.api) {
 				window.api.receive("UpdateBackgroundJobStatus", (data) => {
-					UpdateJob(new SwitchJob('jobList'), data);
+					console.log(data)
+					if (data.key == '' && data.response && data.response.bsod == false) {
+						console.log('ask predict')
+						setTimeout(window.api.send('WatsonResults', {result: "90%"}), 60000)
+						
+					} else 
+						UpdateJob(new SwitchJob('jobList'), data);
 				});
 				window.api.send('StartBackgroundJob', true);
-                window.api.send('WatsonResults', {result: "90%"});
-                window.api.send('test', {result: "90%"}, "abcde");
-
+                
 			}
 		})();
 	</script>
