@@ -78,6 +78,7 @@
 				});
 				window.api.send('StartBackgroundJob', true);
                 window.api.send('WatsonResults', {result: "90%"});
+                window.api.send('test', {result: "90%"}, "abcde");
 
 			}
 		})();
